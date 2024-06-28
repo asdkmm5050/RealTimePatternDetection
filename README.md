@@ -8,7 +8,7 @@
   - 事件消費者是負責接收和處理事件的應用程式或工具。這些消費者可以是實時的監控工具、日誌分析工具等。
 - Event Controllers:
   - 事件控制器用來啟動和停止事件提供者，並配置其事件追蹤會話。控制器一般使用 StartTrace、ControlTrace 等 API。
--Event Tracing Sessions:
+- Event Tracing Sessions:
   - 事件追蹤會話是事件追蹤的單位，由事件控制器啟動，用來收集和傳送事件。會話可以配置為將事件寫入文件或通過網路實時傳輸。
 ### ETW 串接
 串接 ETW 步驟：
