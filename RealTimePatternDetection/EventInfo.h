@@ -4,6 +4,11 @@
 class EventInfo {
 public:
 	EventInfo();
+	EventInfo(const int& In_pid,
+			  const std::wstring& In_uid,
+			  const std::wstring& In_file_path,
+			  const int& In_event_type_id,
+			  const time_t& In_time);
 	~EventInfo();
 
 	void SetPid(const int& In_pid);
@@ -30,6 +35,13 @@ inline EventInfo::EventInfo() :
 	pid_(0),
 	event_type_id_(0),
 	event_time_(0) {}
+
+inline EventInfo::EventInfo(const int& In_pid, const std::wstring& In_uid, const std::wstring& In_file_path, const int& In_event_type_id, const time_t& In_time) :
+	pid_(In_pid),
+	uid_(In_uid),
+	file_path_(In_file_path),
+	event_type_id_(In_event_type_id),
+	event_time_(In_time) {}
 
 inline EventInfo::~EventInfo() = default;
 
