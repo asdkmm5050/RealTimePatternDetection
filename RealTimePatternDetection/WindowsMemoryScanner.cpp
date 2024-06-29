@@ -3,6 +3,7 @@
 #include <windows.h>
 #include <tlhelp32.h>
 #include <iostream>
+#include <vector>
 
 #include "EventInfoJsonGenerator.h"
 
@@ -39,33 +40,28 @@ bool WindowsMemoryScanner::ScanMemory(const EventInfo& In_event_info,
 			throw std::runtime_error("OpenProcess failed with error: " + std::to_string(GetLastError()));
 		}
 
-		SYSTEM_INFO system_info;
-		MEMORY_BASIC_INFORMATION memory_basic_info = { nullptr };
-		ZeroMemory(&system_info, sizeof(SYSTEM_INFO));
-		this->windows_api_wrapper_->GetSystemInfo(&system_info);
+		SYSTEM_INFO sys_info;
+		this->windows_api_wrapper_->GetSystemInfo(&sys_info);
+		MEMORY_BASIC_INFORMATION mem_info;
+		LPVOID adder = nullptr;
 
-		auto address = static_cast<PBYTE>(system_info.lpMinimumApplicationAddress);
-		while (address < static_cast<PBYTE>(system_info.lpMaximumApplicationAddress)) {
-			ZeroMemory(&memory_basic_info, sizeof(MEMORY_BASIC_INFORMATION));
-
-			if (!this->windows_api_wrapper_->VirtualQueryEx(process, address, &memory_basic_info, sizeof(MEMORY_BASIC_INFORMATION))) {
-				throw std::runtime_error("VirtualQueryEx failed with error: " + std::to_string(GetLastError()));
-			}
-
-			if (memory_basic_info.State == MEM_COMMIT && (memory_basic_info.Protect == PAGE_READWRITE || memory_basic_info.Protect == PAGE_READONLY)) {
-				auto buffer = std::make_unique<wchar_t[]>(memory_basic_info.RegionSize);
+		while (this->windows_api_wrapper_->VirtualQueryEx(process, adder, &mem_info, sizeof(mem_info))) {
+			if (mem_info.State == MEM_COMMIT && (mem_info.Protect == PAGE_READWRITE || mem_info.Protect == PAGE_EXECUTE_READWRITE)) {
+				std::vector<char> buffer(mem_info.RegionSize);
 				SIZE_T bytes_read;
-				if (this->windows_api_wrapper_->ReadProcessMemory(process, address, buffer.get(), memory_basic_info.RegionSize, &bytes_read)) {
-					if (std::search(buffer.get(), buffer.get() + bytes_read, In_target_string.begin(), In_target_string.end()) != buffer.get() + bytes_read) {
+
+				if (this->windows_api_wrapper_->ReadProcessMemory(process, mem_info.BaseAddress, buffer.data(), mem_info.RegionSize, &bytes_read)) {
+					std::string memory_contents(buffer.begin(), buffer.end());
+					const size_t pos = memory_contents.find(std::string(In_target_string.begin(), In_target_string.end()));
+					if (pos != std::string::npos) {
+						std::cout << "Found shellcode at address: " <<
+							std::hex << reinterpret_cast<uintptr_t>(mem_info.BaseAddress) << '\n';
 						this->windows_api_wrapper_->CloseHandle(process);
 						return true;
 					}
-				} else {
-					throw std::runtime_error("ReadProcessMemory failed with error: " + std::to_string(GetLastError()));
 				}
 			}
-
-			address += memory_basic_info.RegionSize;
+			adder = static_cast<LPBYTE>(mem_info.BaseAddress) + mem_info.RegionSize;
 		}
 
 		this->windows_api_wrapper_->CloseHandle(process);
