@@ -1,0 +1,43 @@
+# Visual Studio specific
+.vs/
+*.vcxproj.user
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug*/
+[Rr]elease*/
+x64/
+x86/
+build/
+
+# Backup & Logs
+*.log
+*.tlog
+*.bak
+
+# Compiled source
+*.obj
+*.exe
+*.dll
+*.lib
+*.pdb
+*.idb
+
+# Others
+*.class
+*.o
+*.a
+*.so
+*.swp
+
+# NuGet Packages
+*.nupkg
+**/packages/*
+
+# MSBuild Binary and Log
+*.cache
+*.csproj.FileListAbsolute.txt
+*.tlog/
