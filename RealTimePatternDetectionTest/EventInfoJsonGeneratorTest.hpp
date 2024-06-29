@@ -38,8 +38,6 @@ TEST_F(EventInfoJsonGeneratorTest, AddIntoQueueTest) {
 	EXPECT_EQ(generator.event_infos_.size(), 2);
 	generator.AddIntoQueue(event);
 	EXPECT_EQ(generator.event_infos_.size(), 3);
-
-	generator.Save(L"test");
 	std::remove("test.json");
 }
 
@@ -101,14 +99,13 @@ TEST_F(EventInfoJsonGeneratorTest, AutoSavingFundationTest) {
 	EXPECT_CALL(mock_event_info_json_generator, Save(testing::_))
 		.Times(testing::AtLeast(1));
 
-	mock_event_info_json_generator.StartSave();
-
 	EventInfo event;
 	event.SetPid(1234);
 	event.SetUid(L"test_uid");
 	event.SetFilePath(L"test_path");
 
 	mock_event_info_json_generator.AddIntoQueue(event);
-	std::this_thread::sleep_for(std::chrono::milliseconds(200));
+	mock_event_info_json_generator.StartSave();
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	mock_event_info_json_generator.StopSave();
 }
