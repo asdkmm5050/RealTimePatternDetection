@@ -3,7 +3,7 @@
 
 EventMonitor* EventMonitor::Create(const EventMonitorType& In_type) {
 	switch (In_type) {
-		case krabsetw: return new KrabsetwEventMonitor();
+		case EventMonitorType::krabsetw: return new KrabsetwEventMonitor(std::make_shared<KrabsetwUserTraceWrapper>(L"KrabsetwEventMonitor"));
 	}
 	return nullptr;
 }

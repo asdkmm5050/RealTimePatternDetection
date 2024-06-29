@@ -138,7 +138,7 @@
     <ClCompile Include="EventMonitor.cpp" />
     <ClCompile Include="KrabsetwEventMonitor.cpp" />
     <ClCompile Include="MemoryScanner.cpp" />
-    <ClCompile Include="EventInfoDao.cpp" />
+    <ClCompile Include="EventInfoJsonGenerator.cpp" />
     <ClCompile Include="ProcessDetector.cpp" />
     <ClCompile Include="source.cpp" />
     <ClCompile Include="WindowsMemoryScanner.cpp" />
@@ -149,10 +149,20 @@
     <ClInclude Include="MemoryScanner.h" />
     <ClInclude Include="EventInfo.h" />
     <ClInclude Include="ProcessDetector.h" />
-    <ClInclude Include="EventInfoDao.h" />
+    <ClInclude Include="EventInfoJsonGenerator.h" />
     <ClInclude Include="WindowsMemoryScanner.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.7\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets" Condition="Exists('..\packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.7\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>此專案參考這部電腦上所缺少的 NuGet 套件。請啟用 NuGet 套件還原，以下載該套件。如需詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的檔案是 {0}。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.7\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.1.8.1.7\build\native\Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn.targets'))" />
+  </Target>
 </Project>

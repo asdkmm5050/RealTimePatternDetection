@@ -1,5 +1,4 @@
 #pragma once
-#include <memory>
 
 #include "EventMonitor.h"
 #include "MemoryScanner.h"
@@ -7,13 +6,13 @@
 class ProcessDetector {
 public:
 	/**
-	 * @brief Create ProcessDetector
-	 * @param In_event_monitor Input EventMonitor shared_ptr
-	 * @param In_memory_scanner Input MemoryScanner shared_ptr
+	 * @brief Create ProcessDetector with an event monitor and a memory scanner
+	 * @param In_monitor_type Input EventMonitor type
+	 * @param In_scanner_type Input MemoryScanner type
 	 * @return ProcessDetector ptr
 	 */
-	static ProcessDetector* Create(const std::shared_ptr<EventMonitor>& In_event_monitor,
-	                               const std::shared_ptr<MemoryScanner>& In_memory_scanner);
+	static ProcessDetector* Create(const EventMonitorType& In_monitor_type,
+								   const MemoryScannerType& In_scanner_type);
 
 	/**
 	 * @brief Destroy ProcessDetector

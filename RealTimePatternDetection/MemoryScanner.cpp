@@ -2,7 +2,7 @@
 #include "WindowsMemoryScanner.h"
 MemoryScanner* MemoryScanner::Create(const MemoryScannerType& In_type) {
 	switch (In_type) {
-		case windows: return new WindowsMemoryScanner();
+		case MemoryScannerType::windows: return new WindowsMemoryScanner(std::make_shared<WindowsApiWrapper>());
 	}
 	return nullptr;
 }

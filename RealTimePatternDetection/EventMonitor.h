@@ -2,42 +2,44 @@
 #include <functional>
 #include "EventInfo.h"
 
-enum EventMonitorType
-{
-	krabsetw,
+// Enum defining types of event monitors
+enum class EventMonitorType {
+    krabsetw,  // Type of event monitor using Krabsetw library
 };
 
+// Abstract class representing an Event Monitor
 class EventMonitor {
 public:
-	/**
-	 * @brief Create event monitor
-	 * @param In_type Monitor type
-	 * @return Monitor ptr
-	 */
-	static EventMonitor* Create(const EventMonitorType& In_type);
+    /**
+     * @brief Factory method to create an event monitor instance based on type.
+     * @param In_type Type of event monitor to create.
+     * @return Pointer to the created EventMonitor instance.
+     */
+    static EventMonitor* Create(const EventMonitorType& In_type);
 
-	/**
-	 * @brief Destroy event monitor
-	 * @param In_event_monitor Input Monitor ptr
-	 */
-	static void Destroy(const EventMonitor* In_event_monitor);
+    /**
+     * @brief Destructor to destroy the event monitor instance.
+     * @param In_event_monitor Pointer to the EventMonitor instance to destroy.
+     */
+    static void Destroy(const EventMonitor* In_event_monitor);
 
-	/**
-	 * @brief Start event monitor
-	 */
-	virtual void Start() = 0;
+    /**
+     * @brief Start the event monitoring process.
+     */
+    virtual void Start() = 0;
 
-	/**
-	 * @brief Stop event monitor
-	 */
-	virtual void Stop() = 0;
+    /**
+     * @brief Stop the event monitoring process.
+     */
+    virtual void Stop() = 0;
 
-	/**
-	 * @brief Set the callback function when event triggered
-	 * @param In_callback Callback function
-	 */
-	virtual void SetEventTriggeredCallback(const std::function<void(const EventInfo& In_event_info)>& In_callback) = 0;
+    /**
+     * @brief Set a callback function to be called when a specific event (such as ProcessStart) is triggered.
+     * @param In_callback Callback function to handle the event.
+     */
+    virtual void SetProcessStartEventTriggeredCallback(const std::function<void(const EventInfo&)>& In_callback) = 0;
 
 protected:
-	virtual ~EventMonitor() = default;
+    // Protected destructor to ensure the class is abstract.
+    virtual ~EventMonitor() = default;
 };
