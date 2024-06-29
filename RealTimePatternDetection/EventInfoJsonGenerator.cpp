@@ -50,11 +50,8 @@ EventInfoJsonGeneratorImpl::EventInfoJsonGeneratorImpl() :
 	interval_time_(INT_MAX) {}
 
 EventInfoJsonGeneratorImpl::~EventInfoJsonGeneratorImpl() {
-	EventInfoJsonGeneratorImpl::StopSave();
-	EventInfoJsonGeneratorImpl::Save(std::to_wstring(std::time(nullptr)) + L".json");
-	if (save_event_thread_.joinable()) {
-		save_event_thread_.join();
-	}
+	this->EventInfoJsonGeneratorImpl::StopSave();
+	this->EventInfoJsonGeneratorImpl::Save(std::to_wstring(std::time(nullptr)) + L".json");
 }
 
 void EventInfoJsonGeneratorImpl::AddIntoQueue(const EventInfo& In_event_info) {
@@ -63,26 +60,36 @@ void EventInfoJsonGeneratorImpl::AddIntoQueue(const EventInfo& In_event_info) {
 }
 
 void EventInfoJsonGeneratorImpl::StartSave() {
-	save_event_thread_is_running_ = true;
-	save_event_thread_ = std::thread([&] {
-		while (true) {
-			std::unique_lock<std::mutex> lock(this->save_event_thread_cv_mutex_);
-			if (!this->save_event_thread_cv_.wait_for(lock, std::chrono::seconds(this->interval_time_),
-													  [&] { return !this->save_event_thread_is_running_; })) {
+	if (this->save_event_thread_is_running_) {
+		return;
+	}
+	this->save_event_thread_is_running_ = true;
 
-				this->Save(std::to_wstring(std::time(nullptr)) + L".json");
-			} else {
+	bool thread_started(false);
+
+	this->save_event_thread_ = std::thread([&] {
+		thread_started = true;
+		while (this->save_event_thread_is_running_) {
+			std::unique_lock<std::mutex> lock(this->save_event_thread_cv_mutex_);
+			if (this->save_event_thread_cv_.wait_for(lock, std::chrono::seconds(this->interval_time_), [&] {return !this->save_event_thread_is_running_; })) {
 				break;
 			}
+			this->Save(std::to_wstring(std::time(nullptr)) + L".json");
 		}
 	});
+
+	while (!thread_started);
 }
 
 void EventInfoJsonGeneratorImpl::StopSave() {
-	save_event_thread_is_running_ = false;
-	save_event_thread_cv_.notify_all();
+	if (this->save_event_thread_is_running_) {
+		this->save_event_thread_is_running_ = false;
+		this->save_event_thread_cv_.notify_all();
+		if (this->save_event_thread_.joinable()) {
+			this->save_event_thread_.join();
+		}
+	}
 }
-
 void EventInfoJsonGeneratorImpl::Save(const std::wstring& In_file_name) {
 	if (!this->event_infos_.empty()) {
 		nlohmann::json j;
@@ -105,7 +112,6 @@ void EventInfoJsonGeneratorImpl::Save(const std::wstring& In_file_name) {
 
 void EventInfoJsonGeneratorImpl::SetSaveInterval(const int& In_sec) {
 	this->interval_time_ = In_sec;
-	save_event_thread_cv_.notify_all();
 }
 
 std::string EventInfoJsonGeneratorImpl::ws2s(const std::wstring& In_w_str) {

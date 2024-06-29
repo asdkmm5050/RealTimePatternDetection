@@ -13,6 +13,7 @@ public:
 		memory_basic_info_.State = MEM_COMMIT;
 		memory_basic_info_.Protect = PAGE_READWRITE;
 		memory_basic_info_.RegionSize = 1000;
+		memory_basic_info_.BaseAddress = static_cast<PVOID>(nullptr);
 
 		system_info_.lpMinimumApplicationAddress = reinterpret_cast<void*>(0);
 		system_info_.lpMaximumApplicationAddress = reinterpret_cast<void*>(1000);
@@ -21,8 +22,12 @@ public:
 			return reinterpret_cast<void*>(1);
 		}));
 		ON_CALL(*this, VirtualQueryEx(testing::_, testing::_, testing::_, testing::_))
-			.WillByDefault(testing::Invoke([&](HANDLE, LPCVOID, const PMEMORY_BASIC_INFORMATION In_basic_info, SIZE_T) -> SIZE_T {
+			.WillByDefault(testing::Invoke([&](HANDLE, LPCVOID In_adder, const PMEMORY_BASIC_INFORMATION In_basic_info, SIZE_T) -> SIZE_T {
 			*In_basic_info = this->memory_basic_info_;
+
+			if (In_adder != memory_basic_info_.BaseAddress) {
+				return 0;
+			}
 			return 1;
 		}));
 
@@ -67,10 +72,7 @@ TEST_F(WindowsMemoryScannerTest, ScanMemoryTest) {
 
 	WindowsMemoryScanner scanner(mock_api_wrapper);
 
-	EventInfo event_info;
-	event_info.SetFilePath(L"home/home");
-
-	auto a = mock_api_wrapper.get();
+	const EventInfo event_info(1, L"", L"home/home", 1, std::time(nullptr));
 
 	EXPECT_CALL(*mock_api_wrapper, OpenProcess(testing::_, testing::_, testing::_))
 		.Times(testing::AtLeast(1));
