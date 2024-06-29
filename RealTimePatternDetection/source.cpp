@@ -12,7 +12,7 @@ int main() {
 			ProcessDetector::Create(EventMonitorType::krabsetw, MemoryScannerType::windows),
 			&ProcessDetector::Destroy);
 
-		process_detector->SetTargetString(L"Code.exe");
+		process_detector->SetTargetString(L"i am a shellcode");
 		process_detector->SetFilePath(L"C:\\\\Users");
 
 		process_detector->Start();
