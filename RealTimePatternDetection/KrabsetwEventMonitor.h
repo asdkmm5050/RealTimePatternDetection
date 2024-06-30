@@ -18,6 +18,18 @@ private:
 	std::shared_ptr<krabs::user_trace> session_;
 };
 
+class KrabsetwParserWrapper {
+public:
+	KrabsetwParserWrapper();
+	virtual ~KrabsetwParserWrapper();
+	virtual void SetSchema(const krabs::schema& In_schema);
+	virtual uint32_t ParseUInt32(const std::wstring& In_w_str);
+	virtual std::wstring ParseWString(const std::wstring& In_w_str);
+
+private:
+	std::shared_ptr<krabs::parser> parser_;
+};
+
 class KrabsetwEventMonitor : public EventMonitor {
 public:
 	friend class KrabsetwEventMonitorTest;
@@ -25,7 +37,8 @@ public:
 	FRIEND_TEST(KrabsetwEventMonitorTest, CheckMonitorThreadStatusAfterStopMonitorTest);
 	FRIEND_TEST(KrabsetwEventMonitorTest, CallbackShouldBeCalledAfterProcessStartEventTest);
 
-	KrabsetwEventMonitor(const std::shared_ptr<KrabsetwUserTraceWrapper>& In_session);
+	KrabsetwEventMonitor(const std::shared_ptr<KrabsetwUserTraceWrapper>& In_session,
+						 const std::shared_ptr<KrabsetwParserWrapper>& In_parser);
 	~KrabsetwEventMonitor() override;
 
 	void Start() override;
@@ -44,6 +57,7 @@ private:
 
 	std::function<void(const EventInfo& In_process_info)> on_process_start_callback_;
 	std::shared_ptr<KrabsetwUserTraceWrapper> session_;
+	std::shared_ptr<KrabsetwParserWrapper> parser_;
 	krabs::provider<> provider_;
 	std::thread detect_thread_;
 	bool detect_thread_is_running_;

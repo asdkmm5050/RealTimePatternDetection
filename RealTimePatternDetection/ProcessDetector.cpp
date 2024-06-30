@@ -25,9 +25,9 @@ private:
 };
 
 ProcessDetectorImpl::ProcessDetectorImpl(const EventMonitorType& In_monitor_type,
-										 const MemoryScannerType& In_scanner_type) {
-	this->event_monitor_ = std::shared_ptr<EventMonitor>(EventMonitor::Create(In_monitor_type), &EventMonitor::Destroy);
-	this->memory_scanner_ = std::shared_ptr<MemoryScanner>(MemoryScanner::Create(In_scanner_type), &MemoryScanner::Destroy);
+										 const MemoryScannerType& In_scanner_type) :
+	event_monitor_(std::shared_ptr<EventMonitor>(EventMonitor::Create(In_monitor_type), &EventMonitor::Destroy)),
+	memory_scanner_(std::shared_ptr<MemoryScanner>(MemoryScanner::Create(In_scanner_type), &MemoryScanner::Destroy)) {
 	this->event_monitor_->SetProcessStartEventTriggeredCallback([this](const EventInfo& In_process_info) {
 		if (this->memory_scanner_->ScanMemory(In_process_info, this->memory_scanner_->GetTargetString(), this->memory_scanner_->GetFilePath())) {
 			EventInfoJsonGenerator::GetInstance().AddIntoQueue(In_process_info);
@@ -39,6 +39,8 @@ ProcessDetectorImpl::~ProcessDetectorImpl() = default;
 
 void ProcessDetectorImpl::Start() {
 	try {
+		EventInfoJsonGenerator::GetInstance().SetSaveInterval(30);
+		EventInfoJsonGenerator::GetInstance().StartSave();
 		this->event_monitor_->Start();
 	} catch (const std::exception& exception) {
 		std::cerr << "ProcessDetectorImpl::Start() : " << exception.what() << "\n";
@@ -48,6 +50,7 @@ void ProcessDetectorImpl::Start() {
 
 void ProcessDetectorImpl::Stop() {
 	this->event_monitor_->Stop();
+	EventInfoJsonGenerator::GetInstance().StopSave();
 }
 
 void ProcessDetectorImpl::SetTargetString(const std::wstring& In_target) {
