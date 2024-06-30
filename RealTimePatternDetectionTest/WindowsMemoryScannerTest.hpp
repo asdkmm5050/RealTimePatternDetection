@@ -67,7 +67,7 @@ public:
 	void TearDown() override {}
 };
 
-TEST_F(WindowsMemoryScannerTest, ScanMemoryTest) {
+TEST_F(WindowsMemoryScannerTest, ScanMemoryFunctionTest) {
 	const auto mock_api_wrapper = std::make_shared<MockWindowsApiWrapper>();
 
 	WindowsMemoryScanner scanner(mock_api_wrapper);

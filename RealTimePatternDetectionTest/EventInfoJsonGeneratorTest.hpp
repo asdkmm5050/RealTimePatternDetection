@@ -24,7 +24,7 @@ protected:
 	}
 };
 
-TEST_F(EventInfoJsonGeneratorTest, AddIntoQueueTest) {
+TEST_F(EventInfoJsonGeneratorTest, QueueSizeShouldBeIncreasedAfterAddToQueueTest) {
 	EventInfoJsonGeneratorImpl generator;
 
 	EventInfo event;
@@ -41,7 +41,7 @@ TEST_F(EventInfoJsonGeneratorTest, AddIntoQueueTest) {
 	std::remove("test.json");
 }
 
-TEST_F(EventInfoJsonGeneratorTest, SaveTest) {
+TEST_F(EventInfoJsonGeneratorTest, SaveEventInfoIntoAJsonFileTest) {
 	EventInfoJsonGeneratorImpl generator;
 
 	EventInfo event1;
@@ -76,7 +76,7 @@ TEST_F(EventInfoJsonGeneratorTest, SaveTest) {
 	EXPECT_EQ(j[1]["file_path"], "test_path_2");
 }
 
-TEST_F(EventInfoJsonGeneratorTest, StartSaveTest) {
+TEST_F(EventInfoJsonGeneratorTest, CheckSavingThreadStatusAfterStartSaveTest) {
 	EventInfoJsonGeneratorImpl generator;
 	generator.StartSave();
 
@@ -85,14 +85,14 @@ TEST_F(EventInfoJsonGeneratorTest, StartSaveTest) {
 	generator.StopSave();
 }
 
-TEST_F(EventInfoJsonGeneratorTest, StopSaveTest) {
+TEST_F(EventInfoJsonGeneratorTest, CheckSavingThreadStatusAfterStopSaveTest) {
 	EventInfoJsonGeneratorImpl generator;
 	generator.StartSave();
 	generator.StopSave();
 	EXPECT_FALSE(generator.save_event_thread_is_running_);
 }
 
-TEST_F(EventInfoJsonGeneratorTest, AutoSavingFundationTest) {
+TEST_F(EventInfoJsonGeneratorTest, AutoSavingFeatureTest) {
 	MockEventInfoJsonGeneratorImpl mock_event_info_json_generator;
 	mock_event_info_json_generator.SetSaveInterval(0);
 
@@ -106,6 +106,6 @@ TEST_F(EventInfoJsonGeneratorTest, AutoSavingFundationTest) {
 
 	mock_event_info_json_generator.AddIntoQueue(event);
 	mock_event_info_json_generator.StartSave();
-	std::this_thread::sleep_for(std::chrono::milliseconds(50));
+	std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	mock_event_info_json_generator.StopSave();
 }

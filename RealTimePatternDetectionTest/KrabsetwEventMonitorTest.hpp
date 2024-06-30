@@ -22,7 +22,7 @@ protected:
 	void TearDown() override {}
 };
 
-TEST_F(KrabsetwEventMonitorTest, StartTest) {
+TEST_F(KrabsetwEventMonitorTest, CheckMonitorThreadStatusAfterStartMonitorTest) {
 	const auto session = std::make_shared<MockUserTraceWrapper>(L"MockMonitor");
 
 	EXPECT_CALL(*session.get(), Start())
@@ -37,7 +37,7 @@ TEST_F(KrabsetwEventMonitorTest, StartTest) {
 	EXPECT_TRUE(monitor.detect_thread_is_running_);
 }
 
-TEST_F(KrabsetwEventMonitorTest, StopTest) {
+TEST_F(KrabsetwEventMonitorTest, CheckMonitorThreadStatusAfterStopMonitorTest) {
 	const auto session = std::make_shared<MockUserTraceWrapper>(L"MockMonitor");
 
 	EXPECT_CALL(*session.get(), Start())
@@ -59,7 +59,7 @@ public:
 	MOCK_METHOD(void, ProcessStartCallback, (const EventInfo& event_info), (const));
 };
 
-TEST_F(KrabsetwEventMonitorTest, ProcessStartEventCallbackTest) {
+TEST_F(KrabsetwEventMonitorTest, CallbackShouldBeCalledAfterProcessStartEventTest) {
 	const auto session = std::make_shared<KrabsetwUserTraceWrapper>(L"MockMonitor");
 
 	KrabsetwEventMonitor monitor(session);
