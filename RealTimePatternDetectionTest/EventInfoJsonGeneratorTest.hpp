@@ -10,6 +10,7 @@
 
 class MockEventInfoJsonGeneratorImpl : public EventInfoJsonGeneratorImpl {
 public:
+	~MockEventInfoJsonGeneratorImpl() override = default;
 	MOCK_METHOD(void, Save, (const std::wstring&), (override));
 };
 

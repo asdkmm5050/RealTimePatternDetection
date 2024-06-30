@@ -7,7 +7,7 @@
 
 class MockUserTraceWrapper : public KrabsetwUserTraceWrapper {
 public:
-	MockUserTraceWrapper(const std::wstring& In_name) : KrabsetwUserTraceWrapper(In_name) {}
+	explicit MockUserTraceWrapper(const std::wstring& In_name) : KrabsetwUserTraceWrapper(In_name) {}
 	~MockUserTraceWrapper() override = default;
 
 	MOCK_METHOD(void, Enable, (const krabs::provider<>&), (override));
