@@ -12,14 +12,14 @@
   - 事件追蹤會話是事件追蹤的單位，由事件控制器啟動，用來收集和傳送事件。會話可以配置為將事件寫入文件或通過網路實時傳輸。
 ### ETW 串接
 #### 串接 ETW 步驟：
-- 啟動事件追蹤會話:
-  - 使用 StartTrace API 來啟動一個新的事件追蹤會話。
+- 啟動事件追蹤Session:
+  - 使用 StartTrace API 來啟動一個新的事件追蹤Session。
 - 啟動事件提供者:
   - 使用 EnableTrace API 啟動特定的事件提供者。
 - 處理事件:
   - 實現一個事件處理器，使用 EventRecordCallback 函數來處理事件。這個函數會在每次事件發生時被調用。
-- 停止事件追蹤會話:
-  - 使用 StopTrace API 停止事件追蹤會話。
+- 停止事件追蹤Session:
+  - 使用 StopTrace API 停止事件追蹤Session。
 
 ### ETW 使用限制
 #### 在開發產品時，使用 ETW 需要考量以下限制：
