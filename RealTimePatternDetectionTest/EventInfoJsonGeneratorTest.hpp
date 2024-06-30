@@ -38,7 +38,6 @@ TEST_F(EventInfoJsonGeneratorTest, QueueSizeShouldBeIncreasedAfterAddToQueueTest
 	EXPECT_EQ(generator.event_infos_.size(), 2);
 	generator.AddIntoQueue(event);
 	EXPECT_EQ(generator.event_infos_.size(), 3);
-	std::remove("test.json");
 }
 
 TEST_F(EventInfoJsonGeneratorTest, SaveEventInfoIntoAJsonFileTest) {

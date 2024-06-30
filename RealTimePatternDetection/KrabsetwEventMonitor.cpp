@@ -3,8 +3,10 @@
 
 #include "EventInfo.h"
 
-KrabsetwEventMonitor::KrabsetwEventMonitor(const std::shared_ptr<KrabsetwUserTraceWrapper>& In_session) :
+KrabsetwEventMonitor::KrabsetwEventMonitor(const std::shared_ptr<KrabsetwUserTraceWrapper>& In_session,
+										   const std::shared_ptr<KrabsetwParserWrapper>& In_parser) :
 	session_(In_session),
+	parser_(In_parser),
 	provider_(L"Microsoft-Windows-Kernel-Process"),
 	detect_thread_is_running_(false) {
 	this->on_process_start_callback_ = [](const EventInfo&) {
@@ -55,12 +57,12 @@ void KrabsetwEventMonitor::SetProcessStartEventTriggeredCallback(const std::func
 void KrabsetwEventMonitor::HandleProcessStartEvent(const EVENT_RECORD& In_record,
 												   const krabs::trace_context& In_trace_context) const {
 	const krabs::schema schema(In_record, In_trace_context.schema_locator);
-	krabs::parser parser(schema);
+	this->parser_->SetSchema(schema);
 
 	if (schema.event_id() == 1) { // Process Start
 		EventInfo event_info;
-		event_info.SetPid(static_cast<int>(parser.parse<uint32_t>(L"ProcessID")));
-		event_info.SetFilePath(devicePathToDrivePath(parser.parse<std::wstring>(L"ImageName")));
+		event_info.SetPid(static_cast<int>(this->parser_->ParseUInt32(L"ProcessID")));
+		event_info.SetFilePath(devicePathToDrivePath(this->parser_->ParseWString(L"ImageName")));
 		std::wstring uid;
 		getUidFromPid(event_info.GetPid(), uid);
 		event_info.SetUid(uid);
@@ -69,10 +71,11 @@ void KrabsetwEventMonitor::HandleProcessStartEvent(const EVENT_RECORD& In_record
 
 		std::wstringstream ss;
 		ss << L"Process Created: PID=" << event_info.GetPid()
+			<< L", EventTypeId=" << event_info.GetEventTypeId()
+			<< L", EventTime=" << event_info.GetEventTime()
 			<< L", UID=" << event_info.GetUid()
 			<< L", FilePath=" << event_info.GetFilePath()
-			<< L", EventTypeId=" << event_info.GetEventTypeId()
-			<< L", EventTime=" << event_info.GetEventTime() << '\n';
+			<< "\n\n";
 
 		std::wcout << ss.str();
 
@@ -155,7 +158,7 @@ std::wstring KrabsetwEventMonitor::devicePathToDrivePath(const std::wstring& In_
 			}
 		}
 	}
-	return L"";
+	return In_device_path;
 }
 
 KrabsetwUserTraceWrapper::KrabsetwUserTraceWrapper(const std::wstring& In_session_name) :
@@ -173,4 +176,20 @@ void KrabsetwUserTraceWrapper::Start() {
 
 void KrabsetwUserTraceWrapper::Stop() {
 	this->session_->stop();
+}
+
+KrabsetwParserWrapper::KrabsetwParserWrapper() = default;
+
+KrabsetwParserWrapper::~KrabsetwParserWrapper() = default;
+
+void KrabsetwParserWrapper::SetSchema(const krabs::schema& In_schema) {
+	this->parser_ = std::make_shared<krabs::parser>(In_schema);
+}
+
+uint32_t KrabsetwParserWrapper::ParseUInt32(const std::wstring& In_w_str) {
+	return this->parser_->parse<uint32_t>(In_w_str);
+}
+
+std::wstring KrabsetwParserWrapper::ParseWString(const std::wstring& In_w_str) {
+	return this->parser_->parse<std::wstring>(In_w_str);
 }

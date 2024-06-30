@@ -22,7 +22,7 @@ public:
 			return reinterpret_cast<void*>(1);
 		}));
 		ON_CALL(*this, VirtualQueryEx(testing::_, testing::_, testing::_, testing::_))
-			.WillByDefault(testing::Invoke([&](HANDLE, LPCVOID In_adder, const PMEMORY_BASIC_INFORMATION In_basic_info, SIZE_T) -> SIZE_T {
+			.WillByDefault(testing::Invoke([&](HANDLE, const LPCVOID In_adder, const PMEMORY_BASIC_INFORMATION In_basic_info, SIZE_T) -> SIZE_T {
 			*In_basic_info = this->memory_basic_info_;
 
 			if (In_adder != memory_basic_info_.BaseAddress) {
@@ -39,7 +39,7 @@ public:
 		}));
 
 		ON_CALL(*this, GetSystemInfo(testing::_))
-			.WillByDefault(testing::Invoke([&](LPSYSTEM_INFO In_system_info) {
+			.WillByDefault(testing::Invoke([&](const LPSYSTEM_INFO In_system_info) {
 			*In_system_info = this->system_info_;
 		}));
 
@@ -72,7 +72,11 @@ TEST_F(WindowsMemoryScannerTest, ScanMemoryFunctionTest) {
 
 	WindowsMemoryScanner scanner(mock_api_wrapper);
 
-	const EventInfo event_info(1, L"", L"home/home", 1, std::time(nullptr));
+	const EventInfo event_info(1,
+							   L"",
+							   L"home/home",
+							   1,
+							   std::time(nullptr));
 
 	EXPECT_CALL(*mock_api_wrapper, OpenProcess(testing::_, testing::_, testing::_))
 		.Times(testing::AtLeast(1));

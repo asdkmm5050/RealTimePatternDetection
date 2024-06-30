@@ -8,14 +8,9 @@
 #include "EventInfoJsonGenerator.h"
 
 WindowsMemoryScanner::WindowsMemoryScanner(const std::shared_ptr<WindowsApiWrapper>& In_windows_api_wrapper) :
-	windows_api_wrapper_(In_windows_api_wrapper) {
-	EventInfoJsonGenerator::GetInstance().SetSaveInterval(30);
-	EventInfoJsonGenerator::GetInstance().StartSave();
-}
+	windows_api_wrapper_(In_windows_api_wrapper) {}
 
-WindowsMemoryScanner::~WindowsMemoryScanner() {
-	EventInfoJsonGenerator::GetInstance().StopSave();
-}
+WindowsMemoryScanner::~WindowsMemoryScanner() = default;
 
 bool WindowsMemoryScanner::ScanMemory(const EventInfo& In_event_info,
 									  const std::wstring& In_target_string,
@@ -54,8 +49,8 @@ bool WindowsMemoryScanner::ScanMemory(const EventInfo& In_event_info,
 					std::string memory_contents(buffer.begin(), buffer.end());
 					const size_t pos = memory_contents.find(std::string(In_target_string.begin(), In_target_string.end()));
 					if (pos != std::string::npos) {
-						std::cout << "Found shellcode at address: " <<
-							std::hex << reinterpret_cast<uintptr_t>(mem_info.BaseAddress) << '\n';
+						std::cout <<"WindowsMemoryScanner::ScanMemory : PID:" << " Found shellcode at address: " <<
+							std::hex << reinterpret_cast<uintptr_t>(mem_info.BaseAddress) << "\n\n";
 						this->windows_api_wrapper_->CloseHandle(process);
 						return true;
 					}

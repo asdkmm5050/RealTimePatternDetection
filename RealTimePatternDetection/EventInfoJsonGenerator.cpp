@@ -50,8 +50,8 @@ EventInfoJsonGeneratorImpl::EventInfoJsonGeneratorImpl() :
 	interval_time_(INT_MAX) {}
 
 EventInfoJsonGeneratorImpl::~EventInfoJsonGeneratorImpl() {
-	this->EventInfoJsonGeneratorImpl::StopSave();
-	this->EventInfoJsonGeneratorImpl::Save(std::to_wstring(std::time(nullptr)) + L".json");
+	EventInfoJsonGeneratorImpl::StopSave();
+	EventInfoJsonGeneratorImpl::Save(std::to_wstring(std::time(nullptr)) + L".json");
 }
 
 void EventInfoJsonGeneratorImpl::AddIntoQueue(const EventInfo& In_event_info) {
