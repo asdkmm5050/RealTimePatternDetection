@@ -76,11 +76,6 @@ bool WindowsMemoryScanner::ScanMemory(const EventInfo& In_event_info,
 	}
 }
 
-
-void WindowsMemoryScanner::SaveEventInfo(const EventInfo& In_event_info) {
-	EventInfoJsonGenerator::GetInstance().AddIntoQueue(In_event_info);
-}
-
 void WindowsMemoryScanner::SetTargetString(const std::wstring& In_target) {
 	this->target_string_ = In_target;
 }

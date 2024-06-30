@@ -32,12 +32,6 @@ public:
     virtual bool ScanMemory(const EventInfo& In_event_info, const std::wstring& In_target_string, const std::wstring& In_file_path) = 0;
 
     /**
-     * @brief Save event information related to a process.
-     * @param In_event_info Information about the process event to save.
-     */
-    virtual void SaveEventInfo(const EventInfo& In_event_info) = 0;
-
-    /**
      * @brief Set the target string to scan for in process memory.
      * @param In_target Target string to set.
      */

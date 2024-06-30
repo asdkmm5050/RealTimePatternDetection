@@ -29,6 +29,9 @@ KrabsetwEventMonitor::~KrabsetwEventMonitor() {
 }
 
 void KrabsetwEventMonitor::Start() {
+	if (this->detect_thread_is_running_) {
+		return;
+	}
 	this->detect_thread_ = std::thread([this] {
 		this->session_->Start();
 	});
@@ -36,10 +39,12 @@ void KrabsetwEventMonitor::Start() {
 }
 
 void KrabsetwEventMonitor::Stop() {
-	this->session_->Stop();
-	this->detect_thread_is_running_ = false;
-	if (this->detect_thread_.joinable()) {
-		this->detect_thread_.join();
+	if (this->detect_thread_is_running_) {
+		this->session_->Stop();
+		this->detect_thread_is_running_ = false;
+		if (this->detect_thread_.joinable()) {
+			this->detect_thread_.join();
+		}
 	}
 }
 

@@ -14,11 +14,11 @@ class EventInfoJsonGeneratorImpl : public EventInfoJsonGenerator {
 public:
 
 	friend class EventInfoJsonGeneratorTest;
-	FRIEND_TEST(EventInfoJsonGeneratorTest, AddIntoQueueTest);
-	FRIEND_TEST(EventInfoJsonGeneratorTest, StartSaveTest);
-	FRIEND_TEST(EventInfoJsonGeneratorTest, StopSaveTest);
-	FRIEND_TEST(EventInfoJsonGeneratorTest, SaveTest);
-	FRIEND_TEST(EventInfoJsonGeneratorTest, AutoSavingFundationTest);
+	FRIEND_TEST(EventInfoJsonGeneratorTest, QueueSizeShouldBeIncreasedAfterAddToQueueTest);
+	FRIEND_TEST(EventInfoJsonGeneratorTest, CheckSavingThreadStatusAfterStartSaveTest);
+	FRIEND_TEST(EventInfoJsonGeneratorTest, CheckSavingThreadStatusAfterStopSaveTest);
+	FRIEND_TEST(EventInfoJsonGeneratorTest, SaveEventInfoIntoAJsonFileTest);
+	FRIEND_TEST(EventInfoJsonGeneratorTest, AutoSavingFeatureTest);
 
 	EventInfoJsonGeneratorImpl();
 	~EventInfoJsonGeneratorImpl() override;

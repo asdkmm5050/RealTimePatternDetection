@@ -3,6 +3,8 @@
 #include <iostream>
 #include <memory>
 
+#include "EventInfoJsonGenerator.h"
+
 class ProcessDetectorImpl : public ProcessDetector {
 public:
 	ProcessDetectorImpl(const EventMonitorType& In_monitor_type,
@@ -28,7 +30,7 @@ ProcessDetectorImpl::ProcessDetectorImpl(const EventMonitorType& In_monitor_type
 	this->memory_scanner_ = std::shared_ptr<MemoryScanner>(MemoryScanner::Create(In_scanner_type), &MemoryScanner::Destroy);
 	this->event_monitor_->SetProcessStartEventTriggeredCallback([this](const EventInfo& In_process_info) {
 		if (this->memory_scanner_->ScanMemory(In_process_info, this->memory_scanner_->GetTargetString(), this->memory_scanner_->GetFilePath())) {
-			this->memory_scanner_->SaveEventInfo(In_process_info);
+			EventInfoJsonGenerator::GetInstance().AddIntoQueue(In_process_info);
 		}
 	});
 }

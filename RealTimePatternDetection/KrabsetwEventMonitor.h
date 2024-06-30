@@ -10,11 +10,8 @@ class KrabsetwUserTraceWrapper {
 public:
 	KrabsetwUserTraceWrapper(const std::wstring& In_session_name);
 	virtual ~KrabsetwUserTraceWrapper();
-
 	virtual void Enable(const krabs::provider<>& In_provider);
-
 	virtual void Start();
-
 	virtual void Stop();
 
 private:
@@ -24,9 +21,9 @@ private:
 class KrabsetwEventMonitor : public EventMonitor {
 public:
 	friend class KrabsetwEventMonitorTest;
-	FRIEND_TEST(KrabsetwEventMonitorTest, StartTest);
-	FRIEND_TEST(KrabsetwEventMonitorTest, StopTest);
-	FRIEND_TEST(KrabsetwEventMonitorTest, HandleProcessStartEventTest);
+	FRIEND_TEST(KrabsetwEventMonitorTest, CheckMonitorThreadStatusAfterStartMonitorTest);
+	FRIEND_TEST(KrabsetwEventMonitorTest, CheckMonitorThreadStatusAfterStopMonitorTest);
+	FRIEND_TEST(KrabsetwEventMonitorTest, CallbackShouldBeCalledAfterProcessStartEventTest);
 
 	KrabsetwEventMonitor(const std::shared_ptr<KrabsetwUserTraceWrapper>& In_session);
 	~KrabsetwEventMonitor() override;
