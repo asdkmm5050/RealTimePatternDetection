@@ -1,12 +1,13 @@
 #pragma once
 #include <string>
 
-class EventInfo {
+class EventInfo
+{
 public:
 	EventInfo();
 	EventInfo(const int& In_pid,
-			  const std::wstring& In_uid,
-			  const std::wstring& In_file_path,
+	          std::wstring In_uid,
+	          std::wstring In_file_path,
 			  const int& In_event_type_id,
 			  const time_t& In_time);
 	~EventInfo();
@@ -36,10 +37,10 @@ inline EventInfo::EventInfo() :
 	event_type_id_(0),
 	event_time_(0) {}
 
-inline EventInfo::EventInfo(const int& In_pid, const std::wstring& In_uid, const std::wstring& In_file_path, const int& In_event_type_id, const time_t& In_time) :
+inline EventInfo::EventInfo(const int& In_pid, std::wstring In_uid, std::wstring In_file_path, const int& In_event_type_id, const time_t& In_time) :
 	pid_(In_pid),
-	uid_(In_uid),
-	file_path_(In_file_path),
+	uid_(std::move(In_uid)),
+	file_path_(std::move(In_file_path)),
 	event_type_id_(In_event_type_id),
 	event_time_(In_time) {}
 
