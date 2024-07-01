@@ -42,8 +42,8 @@ void ProcessDetectorImpl::Start() {
 		EventInfoJsonGenerator::GetInstance().SetSaveInterval(30);
 		EventInfoJsonGenerator::GetInstance().StartSave();
 		this->event_monitor_->Start();
-	} catch (const std::exception& exception) {
-		std::cerr << "ProcessDetectorImpl::Start() : " << exception.what() << "\n";
+	} catch (const std::exception& e) {
+		std::cerr << "ProcessDetectorImpl::Start() : " << e.what() << "\n";
 	}
 }
 

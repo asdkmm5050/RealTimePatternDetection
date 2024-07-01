@@ -19,7 +19,7 @@ KrabsetwEventMonitor::KrabsetwEventMonitor(const std::shared_ptr<KrabsetwUserTra
 		} catch (const krabs::could_not_find_schema&) {
 			throw;
 		} catch (const std::exception& e) {
-			std::cout << e.what() << "\n";
+			std::cerr << e.what() << "\n";
 		}
 	});
 
