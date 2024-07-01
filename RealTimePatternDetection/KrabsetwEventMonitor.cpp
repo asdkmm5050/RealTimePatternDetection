@@ -19,7 +19,7 @@ KrabsetwEventMonitor::KrabsetwEventMonitor(const std::shared_ptr<KrabsetwUserTra
 		} catch (const krabs::could_not_find_schema&) {
 			throw;
 		} catch (const std::exception& e) {
-			std::cerr << e.what() << "\n";
+			std::cout << e.what() << "\n";
 		}
 	});
 
@@ -59,14 +59,14 @@ void KrabsetwEventMonitor::HandleProcessStartEvent(const EVENT_RECORD& In_record
 	const krabs::schema schema(In_record, In_trace_context.schema_locator);
 	this->parser_->SetSchema(schema);
 
-	if (schema.event_id() == 1) { // Process Start
+	if (this->parser_->GetSchemaEventId() == 1) { // Process Start
 		EventInfo event_info;
 		event_info.SetPid(static_cast<int>(this->parser_->ParseUInt32(L"ProcessID")));
 		event_info.SetFilePath(devicePathToDrivePath(this->parser_->ParseWString(L"ImageName")));
 		std::wstring uid;
 		getUidFromPid(event_info.GetPid(), uid);
 		event_info.SetUid(uid);
-		event_info.SetEventTypeId(schema.event_id());
+		event_info.SetEventTypeId(this->parser_->GetSchemaEventId());
 		event_info.SetEventTime(std::time(nullptr));
 
 		std::wstringstream ss;
@@ -183,7 +183,12 @@ KrabsetwParserWrapper::KrabsetwParserWrapper() = default;
 KrabsetwParserWrapper::~KrabsetwParserWrapper() = default;
 
 void KrabsetwParserWrapper::SetSchema(const krabs::schema& In_schema) {
-	this->parser_ = std::make_shared<krabs::parser>(In_schema);
+	this->schema_ = std::make_shared<krabs::schema>(In_schema);
+	this->parser_ = std::make_shared<krabs::parser>(*this->schema_);
+}
+
+int KrabsetwParserWrapper::GetSchemaEventId() const {
+	return this->schema_->event_id();
 }
 
 uint32_t KrabsetwParserWrapper::ParseUInt32(const std::wstring& In_w_str) {

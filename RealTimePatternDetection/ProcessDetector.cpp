@@ -44,7 +44,6 @@ void ProcessDetectorImpl::Start() {
 		this->event_monitor_->Start();
 	} catch (const std::exception& exception) {
 		std::cerr << "ProcessDetectorImpl::Start() : " << exception.what() << "\n";
-		std::cout << "ProcessDetectorImpl::Start() : " << exception.what() << "\n";
 	}
 }
 

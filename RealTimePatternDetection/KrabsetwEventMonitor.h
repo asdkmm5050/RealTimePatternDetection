@@ -8,7 +8,7 @@ class KrabsetwEventMonitorTest;
 
 class KrabsetwUserTraceWrapper {
 public:
-	KrabsetwUserTraceWrapper(const std::wstring& In_session_name);
+	explicit KrabsetwUserTraceWrapper(const std::wstring& In_session_name);
 	virtual ~KrabsetwUserTraceWrapper();
 	virtual void Enable(const krabs::provider<>& In_provider);
 	virtual void Start();
@@ -23,11 +23,13 @@ public:
 	KrabsetwParserWrapper();
 	virtual ~KrabsetwParserWrapper();
 	virtual void SetSchema(const krabs::schema& In_schema);
+	virtual int GetSchemaEventId() const;
 	virtual uint32_t ParseUInt32(const std::wstring& In_w_str);
 	virtual std::wstring ParseWString(const std::wstring& In_w_str);
 
 private:
 	std::shared_ptr<krabs::parser> parser_;
+	std::shared_ptr<krabs::schema> schema_;
 };
 
 class KrabsetwEventMonitor : public EventMonitor {
