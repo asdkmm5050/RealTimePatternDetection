@@ -51,7 +51,6 @@ EventInfoJsonGeneratorImpl::EventInfoJsonGeneratorImpl() :
 
 EventInfoJsonGeneratorImpl::~EventInfoJsonGeneratorImpl() {
 	EventInfoJsonGeneratorImpl::StopSave();
-	EventInfoJsonGeneratorImpl::Save(std::to_wstring(std::time(nullptr)) + L".json");
 }
 
 void EventInfoJsonGeneratorImpl::AddIntoQueue(const EventInfo& In_event_info) {
@@ -88,6 +87,7 @@ void EventInfoJsonGeneratorImpl::StopSave() {
 		if (this->save_event_thread_.joinable()) {
 			this->save_event_thread_.join();
 		}
+		this->Save(std::to_wstring(std::time(nullptr)) + L".json");
 	}
 }
 void EventInfoJsonGeneratorImpl::Save(const std::wstring& In_file_name) {

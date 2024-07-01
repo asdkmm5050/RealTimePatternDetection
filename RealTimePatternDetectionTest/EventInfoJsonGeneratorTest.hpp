@@ -10,6 +10,9 @@
 
 class MockEventInfoJsonGeneratorImpl : public EventInfoJsonGeneratorImpl {
 public:
+	MockEventInfoJsonGeneratorImpl() {
+		ON_CALL(*this, Save(testing::_)).WillByDefault(testing::Return());
+	}
 	~MockEventInfoJsonGeneratorImpl() override = default;
 	MOCK_METHOD(void, Save, (const std::wstring&), (override));
 };
@@ -26,7 +29,7 @@ protected:
 };
 
 TEST_F(EventInfoJsonGeneratorTest, QueueSizeShouldBeIncreasedAfterAddToQueueTest) {
-	EventInfoJsonGeneratorImpl generator;
+	MockEventInfoJsonGeneratorImpl generator;
 
 	EventInfo event;
 	event.SetPid(1234);
@@ -93,19 +96,19 @@ TEST_F(EventInfoJsonGeneratorTest, CheckSavingThreadStatusAfterStopSaveTest) {
 }
 
 TEST_F(EventInfoJsonGeneratorTest, AutoSavingFeatureTest) {
-	MockEventInfoJsonGeneratorImpl mock_event_info_json_generator;
-	mock_event_info_json_generator.SetSaveInterval(0);
+	MockEventInfoJsonGeneratorImpl generator;
+	generator.SetSaveInterval(0);
 
-	EXPECT_CALL(mock_event_info_json_generator, Save(testing::_))
-		.Times(testing::AtLeast(1));
+	EXPECT_CALL(generator, Save(testing::_))
+		.Times(testing::AtLeast(2));
 
 	EventInfo event;
 	event.SetPid(1234);
 	event.SetUid(L"test_uid");
 	event.SetFilePath(L"test_path");
 
-	mock_event_info_json_generator.AddIntoQueue(event);
-	mock_event_info_json_generator.StartSave();
+	generator.AddIntoQueue(event);
+	generator.StartSave();
 	std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	mock_event_info_json_generator.StopSave();
+	generator.StopSave();
 }
