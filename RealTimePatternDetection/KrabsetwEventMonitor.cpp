@@ -35,6 +35,7 @@ void KrabsetwEventMonitor::Start() {
 		return;
 	}
 	this->detect_thread_ = std::thread([this] {
+		std::cout << "KrabsetwEventMonitor::Start() : Start tracing" << "\n";
 		this->session_->Start();
 	});
 	this->detect_thread_is_running_ = true;
@@ -47,6 +48,7 @@ void KrabsetwEventMonitor::Stop() {
 		if (this->detect_thread_.joinable()) {
 			this->detect_thread_.join();
 		}
+		std::cout << "KrabsetwEventMonitor::Stop() : Stop tracing" << "\n";
 	}
 }
 
