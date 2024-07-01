@@ -22,10 +22,14 @@ public:
 		ON_CALL(*this, ParseWString(testing::_)).WillByDefault(testing::Invoke([](const std::wstring&) {
 			return L"home/home";
 		}));
+		ON_CALL(*this, SetSchema(testing::_)).WillByDefault(testing::Return());
+		ON_CALL(*this, GetSchemaEventId()).WillByDefault(testing::Return(1));
 	}
 	~MockParserWrapper() override = default;
 	MOCK_METHOD(uint32_t, ParseUInt32, (const std::wstring&), (override));
 	MOCK_METHOD(std::wstring, ParseWString, (const std::wstring&), (override));
+	MOCK_METHOD(void, SetSchema, (const krabs::schema&), (override));
+	MOCK_METHOD(int, GetSchemaEventId, (), (override, const));
 };
 
 class KrabsetwEventMonitorTest : public testing::Test {
@@ -89,12 +93,24 @@ TEST_F(KrabsetwEventMonitorTest, CallbackShouldBeCalledAfterProcessStartEventTes
 		.Times(testing::AtLeast(1));
 	EXPECT_CALL(*parser, ParseWString(::testing::_))
 		.Times(testing::AtLeast(1));
+	EXPECT_CALL(*parser, GetSchemaEventId())
+		.Times(testing::AtLeast(1));
+	EXPECT_CALL(*parser, SetSchema(::testing::_))
+		.Times(testing::AtLeast(1));
 
-	EVENT_RECORD event_record;
-	event_record.EventHeader.EventDescriptor.Id = 1;
-	event_record.ExtendedData = PEVENT_HEADER_EXTENDED_DATA_ITEM();
-	event_record.UserData = nullptr;
-	event_record.UserContext = nullptr;
+	krabs::guid powershell(L"{A0C1853B-5C40-4B15-8766-3CF1C58F985A}");
+	krabs::testing::record_builder builder(powershell, krabs::id(7942), krabs::version(1));
 
-	monitor.HandleProcessStartEvent(event_record, krabs::trace_context());
+	builder.add_properties()
+		(L"ClassName", L"FakeETWEventForRealz")
+		(L"MethodName", L"asdf")
+		(L"WorkflowGuid", L"asdfasdfasdf")
+		(L"Message", L"This message is completely faked")
+		(L"JobData", L"asdfasdf")
+		(L"ActivityName", L"asaaa")
+		(L"ActivityGuid", L"aaaaa")
+		(L"Parameters", L"asfd");
+
+
+	monitor.HandleProcessStartEvent(builder.create_stub_record(), krabs::trace_context());
 }

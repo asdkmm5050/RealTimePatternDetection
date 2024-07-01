@@ -49,7 +49,7 @@ bool WindowsMemoryScanner::ScanMemory(const EventInfo& In_event_info,
 					std::string memory_contents(buffer.begin(), buffer.end());
 					const size_t pos = memory_contents.find(std::string(In_target_string.begin(), In_target_string.end()));
 					if (pos != std::string::npos) {
-						std::cout <<"WindowsMemoryScanner::ScanMemory : PID:" << " Found shellcode at address: " <<
+						std::cout << "WindowsMemoryScanner::ScanMemory : PID:" << std::to_string(In_event_info.GetPid()) << " Found shellcode at address: " <<
 							std::hex << reinterpret_cast<uintptr_t>(mem_info.BaseAddress) << "\n\n";
 						this->windows_api_wrapper_->CloseHandle(process);
 						return true;
