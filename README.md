@@ -33,7 +33,7 @@
     - 不同版本的 Windows 對 ETW 的支持和功能可能有所不同，需要考慮相容性問題。
 
 ## 程式
-- **請以系統管理員執行Visual Studio，第一次開啟需要比較久的時間來安裝NuGet package(Google Test、Google Mock)**
+- **請以系統管理員執行Visual Studio(我使用2022，2019/2017沒有測試)，第一次開啟需要比較久的時間來安裝NuGet package(Google Test、Google Mock)**
 
 - **套件管理使用vcpkg，我的path為C:\vcpkg，如果有問題可以去專案屬性中修改**
 
