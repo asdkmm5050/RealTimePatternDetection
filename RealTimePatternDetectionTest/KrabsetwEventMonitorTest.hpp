@@ -48,8 +48,7 @@ TEST_F(KrabsetwEventMonitorTest, CheckMonitorThreadStatusAfterStartMonitorTest) 
 	EXPECT_CALL(*session, Stop())
 		.Times(testing::AtLeast(1));
 
-	KrabsetwEventMonitor monitor(session,
-								 std::make_shared<KrabsetwParserWrapper>());
+	KrabsetwEventMonitor monitor(session);
 	monitor.Start();
 	EXPECT_TRUE(monitor.detect_thread_is_running_);
 }
@@ -64,8 +63,7 @@ TEST_F(KrabsetwEventMonitorTest, CheckMonitorThreadStatusAfterStopMonitorTest) {
 	EXPECT_CALL(*session, Stop())
 		.Times(testing::AtLeast(1));
 
-	KrabsetwEventMonitor monitor(session,
-								 std::make_shared<KrabsetwParserWrapper>());
+	KrabsetwEventMonitor monitor(session);
 	monitor.Start();
 	EXPECT_TRUE(monitor.detect_thread_is_running_);
 	monitor.Stop();
@@ -79,8 +77,8 @@ public:
 
 TEST_F(KrabsetwEventMonitorTest, CallbackShouldBeCalledAfterProcessStartEventTest) {
 	const auto session = std::make_shared<KrabsetwUserTraceWrapper>(L"MockMonitor");
-	const auto parser = std::make_shared<MockParserWrapper>();
-	KrabsetwEventMonitor monitor(session, parser);
+	MockParserWrapper parser;
+	KrabsetwEventMonitor monitor(session);
 	const MockCallback mock_callback;
 
 	monitor.SetProcessStartEventTriggeredCallback([&](const EventInfo& In_event_info) {
@@ -89,28 +87,16 @@ TEST_F(KrabsetwEventMonitorTest, CallbackShouldBeCalledAfterProcessStartEventTes
 
 	EXPECT_CALL(mock_callback, ProcessStartCallback(::testing::_))
 		.Times(testing::AtLeast(1));
-	EXPECT_CALL(*parser, ParseUInt32(::testing::_))
+	EXPECT_CALL(parser, ParseUInt32(::testing::_))
 		.Times(testing::AtLeast(1));
-	EXPECT_CALL(*parser, ParseWString(::testing::_))
+	EXPECT_CALL(parser, ParseWString(::testing::_))
 		.Times(testing::AtLeast(1));
-	EXPECT_CALL(*parser, GetSchemaEventId())
+	EXPECT_CALL(parser, GetSchemaEventId())
 		.Times(testing::AtLeast(1));
-	EXPECT_CALL(*parser, SetSchema(::testing::_))
+	EXPECT_CALL(parser, SetSchema(::testing::_))
 		.Times(testing::AtLeast(1));
 
-	krabs::guid powershell(L"{A0C1853B-5C40-4B15-8766-3CF1C58F985A}");
-	krabs::testing::record_builder builder(powershell, krabs::id(7942), krabs::version(1));
+	krabs::testing::record_builder builder(krabs::guid(L"{22FB2CD6-0E7B-422B-A0C7-2FAD1FD0E716}"), krabs::id(1), krabs::version(2));
 
-	builder.add_properties()
-		(L"ClassName", L"FakeETWEventForRealz")
-		(L"MethodName", L"asdf")
-		(L"WorkflowGuid", L"asdfasdfasdf")
-		(L"Message", L"This message is completely faked")
-		(L"JobData", L"asdfasdf")
-		(L"ActivityName", L"asaaa")
-		(L"ActivityGuid", L"aaaaa")
-		(L"Parameters", L"asfd");
-
-
-	monitor.HandleProcessStartEvent(builder.create_stub_record(), krabs::trace_context());
+	monitor.HandleProcessStartEvent(parser, builder.create_stub_record(), krabs::trace_context());
 }

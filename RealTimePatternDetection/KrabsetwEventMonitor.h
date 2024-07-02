@@ -39,15 +39,15 @@ public:
 	FRIEND_TEST(KrabsetwEventMonitorTest, CheckMonitorThreadStatusAfterStopMonitorTest);
 	FRIEND_TEST(KrabsetwEventMonitorTest, CallbackShouldBeCalledAfterProcessStartEventTest);
 
-	KrabsetwEventMonitor(const std::shared_ptr<KrabsetwUserTraceWrapper>& In_session,
-						 const std::shared_ptr<KrabsetwParserWrapper>& In_parser);
+	KrabsetwEventMonitor(const std::shared_ptr<KrabsetwUserTraceWrapper>& In_session);
 	~KrabsetwEventMonitor() override;
 
 	void Start() override;
 	void Stop() override;
 	void SetProcessStartEventTriggeredCallback(const std::function<void(const EventInfo& In_event_info)>& In_callback) override;
-	void HandleProcessStartEvent(const EVENT_RECORD& In_record,
-								 const krabs::trace_context& In_trace_context) const;
+	void HandleProcessStartEvent(KrabsetwParserWrapper& In_parser,
+		                         const EVENT_RECORD& In_record,
+		                         const krabs::trace_context& In_trace_context) const;
 
 private:
 
@@ -59,7 +59,6 @@ private:
 
 	std::function<void(const EventInfo& In_process_info)> on_process_start_callback_;
 	std::shared_ptr<KrabsetwUserTraceWrapper> session_;
-	std::shared_ptr<KrabsetwParserWrapper> parser_;
 	krabs::provider<> provider_;
 	std::thread detect_thread_;
 	bool detect_thread_is_running_;
