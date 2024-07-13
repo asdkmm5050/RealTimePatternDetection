@@ -8,7 +8,8 @@
 #include "EventInfoJsonGenerator.h"
 
 WindowsMemoryScanner::WindowsMemoryScanner(const std::shared_ptr<WindowsApiWrapper>& In_windows_api_wrapper) :
-	windows_api_wrapper_(In_windows_api_wrapper) {}
+	windows_api_wrapper_(In_windows_api_wrapper),
+	shellcode_count_(0) {}
 
 WindowsMemoryScanner::~WindowsMemoryScanner() = default;
 
@@ -17,7 +18,16 @@ bool WindowsMemoryScanner::ScanMemory(const EventInfo& In_event_info,
 									  const std::wstring& In_fail_path) {
 	HANDLE process = nullptr;
 
+	bool return_result(false);
+
 	try {
+		process = this->windows_api_wrapper_->OpenProcess(PROCESS_ALL_ACCESS,
+														  FALSE,
+														  static_cast<DWORD>(In_event_info.GetPid()));
+		if (!process) {
+			throw std::runtime_error("OpenProcess failed with error: " + std::to_string(GetLastError()));
+		}
+
 		if (In_target_string.empty()) {
 			throw std::runtime_error("Target string empty.");
 		}
@@ -28,47 +38,43 @@ bool WindowsMemoryScanner::ScanMemory(const EventInfo& In_event_info,
 			return false;
 		}
 
-		process = this->windows_api_wrapper_->OpenProcess(PROCESS_VM_READ | PROCESS_QUERY_INFORMATION,
-														  FALSE,
-														  static_cast<DWORD>(In_event_info.GetPid()));
-		if (!process) {
-			throw std::runtime_error("OpenProcess failed with error: " + std::to_string(GetLastError()));
-		}
-
 		SYSTEM_INFO sys_info;
 		this->windows_api_wrapper_->GetSystemInfo(&sys_info);
 		MEMORY_BASIC_INFORMATION mem_info;
-		LPVOID adder = nullptr;
+		LPVOID adder = sys_info.lpMinimumApplicationAddress;
 
 		while (this->windows_api_wrapper_->VirtualQueryEx(process, adder, &mem_info, sizeof(mem_info))) {
-			if (mem_info.State == MEM_COMMIT && (mem_info.Protect == PAGE_READWRITE || mem_info.Protect == PAGE_EXECUTE_READWRITE)) {
+			if (mem_info.State == MEM_COMMIT &&
+				!(mem_info.Protect & PAGE_NOACCESS) &&
+				!(mem_info.Protect & PAGE_GUARD)) {
 				std::vector<char> buffer(mem_info.RegionSize);
 				SIZE_T bytes_read;
 
 				if (this->windows_api_wrapper_->ReadProcessMemory(process, mem_info.BaseAddress, buffer.data(), mem_info.RegionSize, &bytes_read)) {
-					std::string memory_contents(buffer.begin(), buffer.end());
-					const size_t pos = memory_contents.find(std::string(In_target_string.begin(), In_target_string.end()));
-					if (pos != std::string::npos) {
-						std::cout << "WindowsMemoryScanner::ScanMemory : PID:" << std::to_string(In_event_info.GetPid()) << " Found shellcode at address: " <<
-							std::hex << reinterpret_cast<uintptr_t>(mem_info.BaseAddress) << "\n\n";
-						this->windows_api_wrapper_->CloseHandle(process);
-						return true;
+					const auto result = strstr(buffer.data(), reinterpret_cast<const char*>(In_target_string.c_str()));
+					if (result) {
+						std::printf("WindowsMemoryScanner::ScanMemory : PID:%d Found shellcode at address: %p Number:%d\n",
+									In_event_info.GetPid(), mem_info.BaseAddress, this->shellcode_count_++);
+						return_result = true;
+						break;
 					}
 				}
 			}
 			adder = static_cast<LPBYTE>(mem_info.BaseAddress) + mem_info.RegionSize;
 		}
 
-		this->windows_api_wrapper_->CloseHandle(process);
-		return false;
+		if (!return_result) {
+			std::printf("WindowsMemoryScanner::ScanMemory : PID:%d No shellcode\n", In_event_info.GetPid());
+		}
 
 	} catch (const std::exception& e) {
-		if (process) {
-			this->windows_api_wrapper_->CloseHandle(process);
-		}
 		std::cerr << "WindowsMemoryScanner::ScanMemory : PID:" << In_event_info.GetPid() << " " << e.what() << '\n';
-		return false;
 	}
+
+	if (process) {
+		this->windows_api_wrapper_->CloseHandle(process);
+	}
+	return return_result;
 }
 
 void WindowsMemoryScanner::SetTargetString(const std::wstring& In_target) {

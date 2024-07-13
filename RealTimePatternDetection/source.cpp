@@ -10,7 +10,6 @@ int main() {
 
 	process_detector->SetTargetString(L"i am a shellcode");
 	process_detector->SetFilePath(L"C:\\\\Users");
-
 	process_detector->Start();
 
 	std::string tmp;

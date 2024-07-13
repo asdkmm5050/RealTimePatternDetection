@@ -9,20 +9,18 @@ KrabsetwEventMonitor::KrabsetwEventMonitor(const std::shared_ptr<KrabsetwUserTra
 	detect_thread_is_running_(false) {
 	this->on_process_start_callback_ = [](const EventInfo&) {
 		std::cout << "KrabsetwEventMonitor::KrabsetwEventMonitor : Event triggered callback not setup yet" << "\n";
-		};
+	};
 	this->provider_.any(0x10);
 	this->provider_.add_on_event_callback([&](const EVENT_RECORD& In_record, const krabs::trace_context& In_trace_context) {
 		try {
 			KrabsetwParserWrapper parser;
 			this->HandleProcessStartEvent(parser, In_record, In_trace_context);
-		}
-		catch (const krabs::could_not_find_schema&) {
+		} catch (const krabs::could_not_find_schema&) {
 			throw;
-		}
-		catch (const std::exception& e) {
+		} catch (const std::exception& e) {
 			std::cerr << e.what() << "\n";
 		}
-		});
+	});
 
 	this->session_->Enable(this->provider_);
 }
@@ -38,7 +36,7 @@ void KrabsetwEventMonitor::Start() {
 	this->detect_thread_ = std::thread([this] {
 		std::cout << "KrabsetwEventMonitor::Start() : Start tracing" << "\n";
 		this->session_->Start();
-		});
+	});
 	this->detect_thread_is_running_ = true;
 }
 
@@ -58,8 +56,8 @@ void KrabsetwEventMonitor::SetProcessStartEventTriggeredCallback(const std::func
 }
 
 void KrabsetwEventMonitor::HandleProcessStartEvent(KrabsetwParserWrapper& In_parser,
-                                                   const EVENT_RECORD& In_record,
-                                                   const krabs::trace_context& In_trace_context) const {
+												   const EVENT_RECORD& In_record,
+												   const krabs::trace_context& In_trace_context) const {
 	const krabs::schema schema(In_record, In_trace_context.schema_locator);
 
 	In_parser.SetSchema(schema);
@@ -79,10 +77,8 @@ void KrabsetwEventMonitor::HandleProcessStartEvent(KrabsetwParserWrapper& In_par
 			<< L", EventTypeId=" << event_info.GetEventTypeId()
 			<< L", EventTime=" << event_info.GetEventTime()
 			<< L", UID=" << event_info.GetUid()
-			<< L", FilePath=" << event_info.GetFilePath()
-			<< "\n\n";
-
-		std::wcout << ss.str();
+			<< L", FilePath=" << event_info.GetFilePath();
+		std::printf("%ls\n", ss.str().c_str());
 
 		this->on_process_start_callback_(event_info);
 	}
@@ -118,9 +114,8 @@ void KrabsetwEventMonitor::getUidFromPid(const uint32_t& In_pid, std::wstring& O
 
 		Out_uid = user_sid;
 
-	}
-	catch (const std::exception& e) {
-		std::cerr << "KrabsetwEventMonitor::getUidFromPid : PID:" << In_pid << " Error: " << e.what() << '\n';
+	} catch (const std::exception& e) {
+		std::cerr << "KrabsetwEventMonitor::getUidFromPid : PID:" << In_pid << " Error: " << e.what() << "\n";
 	}
 
 	if (user_sid != nullptr) {

@@ -29,7 +29,9 @@ public:
      * @param In_file_path Path of event process.
      * @return true if the target string is found in memory, false otherwise.
      */
-    virtual bool ScanMemory(const EventInfo& In_event_info, const std::wstring& In_target_string, const std::wstring& In_file_path) = 0;
+    virtual bool ScanMemory(const EventInfo& In_event_info,
+                            const std::wstring& In_target_string,
+                            const std::wstring& In_file_path) = 0;
 
     /**
      * @brief Set the target string to scan for in process memory.

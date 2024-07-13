@@ -1,5 +1,7 @@
 #pragma once
+#include <list>
 #include <memory>
+#include <mutex>
 
 #include "MemoryScanner.h"
 #include <gtest/gtest_prod.h>
@@ -25,7 +27,9 @@ public:
 
 	explicit WindowsMemoryScanner(const std::shared_ptr<WindowsApiWrapper>& In_windows_api_wrapper);
 	~WindowsMemoryScanner() override;
-	bool ScanMemory(const EventInfo& In_event_info, const std::wstring& In_target_string, const std::wstring& In_fail_path) override;
+	bool ScanMemory(const EventInfo& In_event_info,
+					const std::wstring& In_target_string,
+	                const std::wstring& In_fail_path) override;
 	void SetTargetString(const std::wstring& In_target) override;
 	void SetFilePath(const std::wstring& In_file_path) override;
 
@@ -36,5 +40,6 @@ private:
 
 	std::wstring target_string_;
 	std::wstring file_path_;
+	int shellcode_count_;
 };
 
